@@ -1,0 +1,43 @@
+version: "3"
+services:
+  bs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PORT: 80
+    ports:
+      - 8080:80
+    volumes:
+      - .:/var/www/html/
+    depends_on:
+      - bs_pg
+    environment:
+      DEBUG: 'true'
+    networks:
+      bs_net:
+        ipv4_address: 183.28.1.1
+
+  bs_pg:
+    image: postgres:13.3-alpine
+    ports:
+      - 7432:5432
+    volumes:
+      - db_data:/var/lib/postgres
+    environment:
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: bookstore
+    networks:
+      bs_net:
+        ipv4_address: 183.28.1.2
+
+volumes:
+  db_data: {}
+  redis_data: {}
+  elasticsearch_data: {}
+networks:
+  bs_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 183.28.0.0/16
